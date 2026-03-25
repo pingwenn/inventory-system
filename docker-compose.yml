@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: inventory-mysql
+    restart: always
+    environment:
+      # 設定資料庫名稱
+      MYSQL_DATABASE: inventory_db
+      # 設定 root 密碼
+      MYSQL_ROOT_PASSWORD: password
+    ports:
+      - "3306:3306"
+    volumes:
+      # 將資料存放在專案底下的 mysql_data 資料夾，這樣即使重啟容器資料也不會不見
+      - ./mysql_data:/var/lib/mysql

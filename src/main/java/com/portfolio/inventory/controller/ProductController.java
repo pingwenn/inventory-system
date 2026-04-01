@@ -4,7 +4,9 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,5 +40,19 @@ public class ProductController {
 	@GetMapping
 	public List<Product> getAllProducts(){
 		return productService.getAllProducts();
+	}
+	
+	/* *
+	 * 處理PUT請求的標記，設定網址接收一個動態id
+	 * 加 @PathVariable標記，讓Spring知道這個id是從上面網址擷取下來的
+	 * 加 @Request 標記，把前端傳來的JSON轉換成物件
+	 * return 把從網址抓到的id跟從JSON轉換來的商品資料交給大腦處理
+	 * */
+	@PutMapping("/{id}")
+	public Product updateProduct(
+			@PathVariable Long id,
+			@RequestBody Product productDetails) {
+		
+		return productService.updateProduct(id, productDetails);
 	}
 }

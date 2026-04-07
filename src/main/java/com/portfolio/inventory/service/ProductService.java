@@ -60,4 +60,19 @@ public class ProductService {
 		
 		return productRepository.save(existingProduct);
 	}
+	
+	/* *
+	 * 刪除不需要回商品實體，所以用void(無回傳值)
+	 * 防呆機制：確認這個ID存在
+	 * 
+	 * 呼叫管理員執行刪除
+	 * 使用repository內建的刪除方法，把找到的existingProduct丟進去
+	 * */
+	public void deleteProduct(Long id) {
+		Product existingProduct = productRepository.findById(id)
+				.orElseThrow(() -> new RuntimeException("找不到 ID 為" + id + "的商品"));
+		
+		productRepository.delete(existingProduct);
+	}
 }
+

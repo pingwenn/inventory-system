@@ -3,6 +3,7 @@ package com.portfolio.inventory.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,7 +36,10 @@ public class ProductController {
 	}
 	
 	/* *
-	 * 發送請求時 呼叫getAllProducts
+	 * 發送GET請求時 SpringBoot會透過@GetMapping標記捕捉這個請求
+	 * 並交給Controller的getAllProducts方法處理，接著會呼叫Service
+	 * 層去執行資料庫查詢，最後將「商品列表」回傳給前端
+	 * (SpringBoot底層會自動將Java物件轉換成JSON格式)
 	 * */
 	@GetMapping
 	public List<Product> getAllProducts(){
@@ -45,7 +49,7 @@ public class ProductController {
 	/* *
 	 * 處理PUT請求的標記，設定網址接收一個動態id
 	 * 加 @PathVariable標記，讓Spring知道這個id是從上面網址擷取下來的
-	 * 加 @Request 標記，把前端傳來的JSON轉換成物件
+	 * 加 @RequestBody 標記，把前端傳來的JSON轉換成物件
 	 * return 把從網址抓到的id跟從JSON轉換來的商品資料交給大腦處理
 	 * */
 	@PutMapping("/{id}")
@@ -54,5 +58,16 @@ public class ProductController {
 			@RequestBody Product productDetails) {
 		
 		return productService.updateProduct(id, productDetails);
+	}
+	
+	/* *
+	 * 
+	 * */
+	@DeleteMapping("/{id}")
+	public String deleteProduct(@PathVariable Long id) {
+		productService.deleteProduct(id);
+		
+		return "商品刪除成功";
+		
 	}
 }

@@ -3,6 +3,7 @@ package com.portfolio.inventory.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,6 +20,7 @@ import com.portfolio.inventory.service.ProductService;
  * */
 @RestController	
 @RequestMapping("/api/products")
+@CrossOrigin //允許所有外部網頁來呼叫API
 public class ProductController {
 	
 	@Autowired
@@ -61,7 +63,10 @@ public class ProductController {
 	}
 	
 	/* *
-	 * 
+	 * 處理DELETE請求的標記，設定網址接收一個動態id
+	 * 加@PathVariable標記，讓Spring知道這個id是從上面網址擷取下來的
+	 * 交給service層處理deleteProduct方法
+	 * return "商品刪除成功"
 	 * */
 	@DeleteMapping("/{id}")
 	public String deleteProduct(@PathVariable Long id) {

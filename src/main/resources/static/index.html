@@ -43,6 +43,25 @@
             </button>
         </form>
 		</div>
+		<div id="editSection" style="display: none; background-color: #fff3cd; padding: 15px; margin-bottom: 20px; border: 1px solid #ffeeba;">
+		        <h3 style="color: #856404;">編輯商品</h3>
+		        <form id="editProductForm">
+		            <input type="hidden" id="editId"> 
+		            
+		            <input type="text" id="editSku" required>
+		            <input type="text" id="editName" required>
+		            <input type="number" id="editPrice" required>
+		            <input type="number" id="editStock" required>
+		            
+		            <button type="submit" style="padding: 5px 10px; background-color: #ffc107; border: none; cursor: pointer;">
+		                儲存修改
+		            </button>
+		            <button type="button" onclick="cancelEdit()" style="padding: 5px 10px; background-color: #6c757d; color: white; border: none; cursor: pointer;">
+		                取消
+		            </button>
+		        </form>
+		    </div>
+		
     <table>
         <thead>
             <tr>
@@ -95,10 +114,14 @@
                     <td>${product.price}</td>
                     <td>${product.stock}</td>
 					<td>
+						<button onclick="openEditForm(${product.id}, '${product.sku}', '${product.name}', ${product.price}, ${product.stock})" style="background-color: #ffc107; border: none; padding: 5px; border-radius: 3px; cursor: pointer; margin-right: 5px;">
+                            編輯
+                        </button>
 						<button onclick="deleteProduct(${product.id})" style="background-color: #dc3545; color: white; border: none; padding: 5px; border-radius: 3px; cursor: pointer;">
 							刪除
 						</button>
 					</td>
+					
                 `;
                 tbody.appendChild(tr);
             });
@@ -124,6 +147,56 @@
 			})
 			.catch(error  => console.error('錯誤：', error));
 		}
+		
+		// 打開編輯表單，並把舊資料塞進去
+        function openEditForm(id, sku, name, price, stock) {
+            document.getElementById('editSection').style.display = 'block'; // 顯示編輯區塊
+            
+            // 把傳進來的資料，填入對應的格子裡
+            document.getElementById('editId').value = id;
+            document.getElementById('editSku').value = sku;
+            document.getElementById('editName').value = name;
+            document.getElementById('editPrice').value = price;
+            document.getElementById('editStock').value = stock;
+        }
+
+        // 取消編輯，把表單藏起來
+        function cancelEdit() {
+            document.getElementById('editSection').style.display = 'none';
+        }
+
+        // 送出修改資料 (PUT 請求)
+        document.getElementById('editProductForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // 阻止重新整理
+
+            const id = document.getElementById('editId').value; // 抓出剛剛偷偷存起來的 ID
+            
+            const updatedProduct = {
+                sku: document.getElementById('editSku').value,
+                name: document.getElementById('editName').value,
+                price: parseFloat(document.getElementById('editPrice').value),
+                stock: parseInt(document.getElementById('editStock').value)
+            };
+
+            // 發送 PUT 請求給後端
+            fetch(`${API_URL}/${id}`, {
+                method: 'PUT', 
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updatedProduct)
+            })
+            .then(response => {
+                if(response.ok) {
+                    alert('商品修改成功');
+                    cancelEdit(); // 隱藏表單
+                    fetchProducts(); // 刷新表格
+                } else {
+                    alert('修改失敗');
+                }
+            })
+            .catch(error => console.error('錯誤:', error));
+        });
 
         fetchProducts(); // 頁面載入時呼叫函數來抓取資料
 
@@ -139,7 +212,7 @@
                 stock: parseInt(document.getElementById('stockInput').value)    // 轉成整數
             };
 
-            // 2. 呼叫 fetch 來發送 POST 請求 (這就等於你之前在終端機打的 curl 指令！)
+            // 2. 呼叫 fetch 來發送 POST 請求 (之前在終端機打的 curl 指令)
             fetch(API_URL, {
                 method: 'POST', // 指定動作是新增
                 headers: {
@@ -149,9 +222,9 @@
             })
             .then(response => {
                 if(response.ok) {
-                    alert('商品新增成功！🎉');
+                    alert('商品新增成功');
                     document.getElementById('addProductForm').reset(); // 清空格子
-                    fetchProducts(); // 重新去後端抓一次最新資料，刷新表格！
+                    fetchProducts(); // 重新去後端抓一次最新資料，刷新表格
                 } else {
                     alert('新增失敗，請檢查後端是否有錯誤。');
                 }
